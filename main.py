@@ -5,9 +5,17 @@ from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from collections import Counter
 
-# TODO: Task 1: Tools for text processing
 
-# TODO: Task 2: Request Moby Dick
+def fetch_moby_dick():
+    url = "https://www.gutenberg.org/files/2701/2701-h/2701-h.htm"  # URL of Moby Dick on Project Gutenberg
+    response = requests.get(url)
+
+    if response.status_code == 200:
+        return response.text
+    else:
+        print("Failed to fetch Moby Dick:", response.status_code)
+        return None
+
 
 # TODO: Task 3: Get the text from the HTML
 
@@ -23,5 +31,16 @@ from collections import Counter
 
 # TODO: Task 9: The most common word
 
+def main():
+    # Fetch Moby Dick content
+    html_content = fetch_moby_dick()
+
+    # Check if content was fetched successfully
+    if html_content:
+        print("HTML content of Moby Dick fetched successfully!")
+    else:
+        print("Failed to fetch HTML content of Moby Dick.")
+
+
 if __name__ == '__main__':
-    pass
+    main()
