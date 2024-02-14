@@ -16,7 +16,7 @@ In this project, we use Python libraries such as requests, BeautifulSoup, and NL
 
 ## Dependencies
 
-- Python 3.11
+- Python 3.9
 - requests
 - BeautifulSoup4
 - nltk
