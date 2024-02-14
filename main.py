@@ -1,10 +1,14 @@
+import os
+import re
+from collections import Counter
+
+import nltk
 import requests
 from bs4 import BeautifulSoup
-import nltk
-import re
-from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
-from collections import Counter
+from nltk.tokenize import word_tokenize
+from tabulate import tabulate
+from tqdm import tqdm
 
 
 # This should be run once before the first run of the script
@@ -60,76 +64,101 @@ def analyze_text(words):
     unique_words = len(set(words))
     word_count = Counter(words).most_common(10)  # Top 10 most common words
 
-    print("Total words in Moby Dick:", total_words)
-    print("Unique words in Moby Dick:", unique_words)
-    print("\nTop 10 most common words:")
-    for word, count in word_count:
-        print(f"{word}: {count}")
+    # Prettify output with colors
+    colored_word_count = [(f"\033[94m{word}\033[0m", f"\033[92m{count}\033[0m") for word, count in word_count]
+
+    # Prepare data for tabular display
+    table_data = [
+                     ["Total words in Moby Dick:", f"\033[95m{total_words}\033[0m"],
+                     ["Unique words in Moby Dick:", f"\033[95m{unique_words}\033[0m"],
+                     ["", ""],  # Empty row for spacing
+                     ["\033[96mTop 10 most common words:\033[0m", ""],
+                 ] + colored_word_count
+
+    # Print the table
+    os.system('cls' if os.name in ('nt', 'dos') else 'clear')
+    print(tabulate(table_data, headers=["Word", "Count"], tablefmt="fancy_grid"))
 
 
 def main():
-    # Fetch Moby Dick content
-    html_content = fetch_moby_dick()
+    steps = [
+        'Fetch HTML content of Moby Dick',
+        'Extract text from HTML content',
+        'Extract words from text content',
+        'Make words lowercase',
+        'Remove non-words',
+        'Load stop words',
+        'Remove stop words',
+    ]
 
-    # Check if content was fetched successfully
-    if html_content:
-        print("HTML content of Moby Dick fetched successfully!")
-    else:
-        print("Failed to fetch HTML content of Moby Dick.")
+    os.system('cls' if os.name in ('nt', 'dos') else 'clear')
+    with tqdm(total=len(steps), desc="Processing steps", position=0, leave=True) as pbar:
+        def take_next_step(next_step: str):
+            pbar.update(1)
+            pbar.set_postfix(ID=next_step)
 
-    # Extract text from HTML content
-    text_content = extract_text_from_html(html_content)
+        for index, step in enumerate(steps):
+            if step == 'Fetch HTML content of Moby Dick':
+                html_content = fetch_moby_dick()
+                if html_content:
+                    take_next_step(steps[index + 1])
+                else:
+                    os.system('cls' if os.name in ('nt', 'dos') else 'clear')
+                    print("Failed to fetch HTML content of Moby Dick.")
+                    return
 
-    # Check if text was extracted successfully
-    if text_content:
-        print("Text extracted successfully!")
-    else:
-        print("Failed to extract text from HTML content.")
+            elif step == 'Extract text from HTML content':
+                text_content = extract_text_from_html(html_content)
+                if text_content:
+                    take_next_step(steps[index + 1])
+                else:
+                    os.system('cls' if os.name in ('nt', 'dos') else 'clear')
+                    print("Failed to extract text from HTML content.")
+                    return
 
-    # Extract words from text content
-    words = extract_words(text_content)
+            elif step == 'Extract words from text content':
+                words = extract_words(text_content)
+                if words:
+                    take_next_step(steps[index + 1])
+                else:
+                    os.system('cls' if os.name in ('nt', 'dos') else 'clear')
+                    print("Failed to extract words from text content.")
+                    return
 
-    # Check if words were extracted successfully
-    if words:
-        print("Words extracted successfully!")
-    else:
-        print("Failed to extract words from text content.")
+            elif step == 'Make words lowercase':
+                lowercase_words = make_words_lowercase(words)
+                if lowercase_words:
+                    os.system('cls' if os.name in ('nt', 'dos') else 'clear')
+                    take_next_step(steps[index + 1])
+                else:
+                    os.system('cls' if os.name in ('nt', 'dos') else 'clear')
+                    print("Failed to convert words to lowercase.")
+                    return
 
-    # Make words lowercase
-    lowercase_words = make_words_lowercase(words)
+            elif step == 'Remove non-words':
+                filtered_lowercase_words = remove_non_words(lowercase_words)
+                if filtered_lowercase_words:
+                    take_next_step(steps[index + 1])
+                else:
+                    os.system('cls' if os.name in ('nt', 'dos') else 'clear')
+                    print("Failed to remove non-words.")
+                    return
 
-    # Check if words were converted to lowercase successfully
-    if lowercase_words:
-        print("Words converted to lowercase successfully!")
-    else:
-        print("Failed to convert words to lowercase.")
+            elif step == 'Load stop words':
+                stop_words = load_stop_words()
+                if stop_words:
+                    take_next_step(steps[index + 1])
+                else:
+                    os.system('cls' if os.name in ('nt', 'dos') else 'clear')
+                    print("Failed to load stop words.")
+                    return
 
-    # Make words lowercase
-    filtered_lowercase_words = remove_non_words(lowercase_words)
-
-    # Check if words were converted to lowercase successfully
-    if filtered_lowercase_words:
-        print("Removed non words successfully!")
-    else:
-        print("Failed to removed non words.")
-
-    # Load stop words
-    stop_words = load_stop_words()
-
-    # Check if stop words were loaded successfully
-    if stop_words:
-        print("Stop words loaded successfully!")
-    else:
-        print("Failed to load stop words.")
-
-    # Call remove_stop_words() to filter out stop words
-    filtered_words = remove_stop_words(filtered_lowercase_words, stop_words)
-
-    # Check if stop words were removed successfully
-    if filtered_words:
-        print("Stop words removed successfully!")
-    else:
-        print("Failed to remove stop words.")
+            elif step == 'Remove stop words':
+                filtered_words = remove_stop_words(filtered_lowercase_words, stop_words)
+                if not filtered_words:
+                    os.system('cls' if os.name in ('nt', 'dos') else 'clear')
+                    print("Failed to remove stop words.")
+                    return
 
     # Call analyze_text() to analyze the processed text
     analyze_text(filtered_words)
