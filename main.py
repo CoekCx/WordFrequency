@@ -28,7 +28,10 @@ def extract_words(text):
     return words
 
 
-# TODO: Task 5: Make the words lowercase
+def make_words_lowercase(words):
+    lowercase_words = [word.lower() for word in words]
+    return lowercase_words
+
 
 # TODO: Task 6: Load in stop words
 
@@ -65,6 +68,15 @@ def main():
         print("Words extracted successfully!")
     else:
         print("Failed to extract words from text content.")
+
+    # Make words lowercase
+    lowercase_words = make_words_lowercase(words)
+
+    # Check if words were converted to lowercase successfully
+    if lowercase_words:
+        print("Words converted to lowercase successfully!")
+    else:
+        print("Failed to convert words to lowercase.")
 
 
 if __name__ == '__main__':
