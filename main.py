@@ -17,7 +17,11 @@ def fetch_moby_dick():
         return None
 
 
-# TODO: Task 3: Get the text from the HTML
+def extract_text_from_html(html_content):
+    soup = BeautifulSoup(html_content, 'html.parser')
+    text = soup.get_text()
+    return text.strip()
+
 
 # TODO: Task 4: Extract the words
 
@@ -40,6 +44,15 @@ def main():
         print("HTML content of Moby Dick fetched successfully!")
     else:
         print("Failed to fetch HTML content of Moby Dick.")
+
+    # Extract text from HTML content
+    text_content = extract_text_from_html(html_content)
+
+    # Check if text was extracted successfully
+    if text_content:
+        print("Text extracted successfully!")
+    else:
+        print("Failed to extract text from HTML content.")
 
 
 if __name__ == '__main__':
