@@ -23,7 +23,10 @@ def extract_text_from_html(html_content):
     return text.strip()
 
 
-# TODO: Task 4: Extract the words
+def extract_words(text):
+    words = word_tokenize(text)
+    return words
+
 
 # TODO: Task 5: Make the words lowercase
 
@@ -53,6 +56,15 @@ def main():
         print("Text extracted successfully!")
     else:
         print("Failed to extract text from HTML content.")
+
+    # Extract words from text content
+    words = extract_words(text_content)
+
+    # Check if words were extracted successfully
+    if words:
+        print("Words extracted successfully!")
+    else:
+        print("Failed to extract words from text content.")
 
 
 if __name__ == '__main__':
