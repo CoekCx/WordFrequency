@@ -6,6 +6,12 @@ from nltk.corpus import stopwords
 from collections import Counter
 
 
+# This should be run once before the first run of the script
+def download_neccessary_nltk_data():
+    nltk.download('punkt')
+    nltk.download('stopwords')
+
+
 def fetch_moby_dick():
     url = "https://www.gutenberg.org/files/2701/2701-h/2701-h.htm"  # URL of Moby Dick on Project Gutenberg
     response = requests.get(url)
@@ -33,7 +39,10 @@ def make_words_lowercase(words):
     return lowercase_words
 
 
-# TODO: Task 6: Load in stop words
+def load_stop_words():
+    stop_words = set(stopwords.words('english'))
+    return stop_words
+
 
 # TODO: Task 7: Remove stop words in Moby Dick
 
@@ -77,6 +86,15 @@ def main():
         print("Words converted to lowercase successfully!")
     else:
         print("Failed to convert words to lowercase.")
+
+    # Load stop words
+    stop_words = load_stop_words()
+
+    # Check if stop words were loaded successfully
+    if stop_words:
+        print("Stop words loaded successfully!")
+    else:
+        print("Failed to load stop words.")
 
 
 if __name__ == '__main__':
