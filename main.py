@@ -44,7 +44,10 @@ def load_stop_words():
     return stop_words
 
 
-# TODO: Task 7: Remove stop words in Moby Dick
+def remove_stop_words(words, stop_words):
+    filtered_words = [word for word in words if word not in stop_words]
+    return filtered_words
+
 
 # TODO: Task 8: We have the answer
 
@@ -95,6 +98,15 @@ def main():
         print("Stop words loaded successfully!")
     else:
         print("Failed to load stop words.")
+
+    # Call remove_stop_words() to filter out stop words
+    filtered_words = remove_stop_words(lowercase_words, stop_words)
+
+    # Check if stop words were removed successfully
+    if filtered_words:
+        print("Stop words removed successfully!")
+    else:
+        print("Failed to remove stop words.")
 
 
 if __name__ == '__main__':
