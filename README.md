@@ -5,10 +5,11 @@ analyze the word distribution using the Natural Language Toolkit (NLTK).
 
 ## Project Description
 
-In this project, we use Python libraries such as requests, BeautifulSoup, and NLTK to perform the following tasks:
+In this project, we use Python libraries such as prompt_toolkit, requests, BeautifulSoup, and NLTK to perform the
+following tasks:
 
-1. **Request Moby Dick**: Fetch the HTML content of Moby Dick from Project Gutenberg.
-2. **Get the text from the HTML**: Parse the HTML content and extract the text of the novel.
+1. **Select Book**: Prompt user to select a book from either the 1000 most popular books on Gutenberg or from a search.
+2. **Request Book**: Fetch the text content of the book from Project Gutenberg.
 3. **Extract the words**: Tokenize the text into words using NLTK's word_tokenize() function.
 4. **Make the words lowercase**: Convert all words to lowercase.
 5. **Remove non-words**: Remove all non-words values.
@@ -24,6 +25,7 @@ In this project, we use Python libraries such as requests, BeautifulSoup, and NL
 - BeautifulSoup4
 - nltk
 - tabulate
+- prompt_toolkit
 
 ## Installation
 

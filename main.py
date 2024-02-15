@@ -1,6 +1,7 @@
 import json
 import os
 import re
+from urllib import parse
 from collections import Counter
 
 import nltk
@@ -85,6 +86,17 @@ def get_all_gutenberg_books():
     return all_books
 
 
+def get_books_by_search(search_term: str):
+    encoded_search_term = parse.quote(search_term)
+    # Construct the URL with the encoded search term
+    url = f"https://www.gutenberg.org/ebooks/search/?query={encoded_search_term}&submit_search=Go%21"
+    books_on_page = get_books_from_page(url)
+    if books_on_page:
+        return expand_books_with_or(books_on_page)
+
+    return None
+
+
 def expand_books_with_or(names_and_urls):
     expanded_books = []
     for book in names_and_urls:
@@ -96,9 +108,42 @@ def expand_books_with_or(names_and_urls):
             name_parts = name.split('; Or, ')
             for part in name_parts:
                 expanded_books.append({'name': part.strip(), 'url': url})
+        elif '; or, ' in name:
+            name_parts = name.split('; or, ')
+            for part in name_parts:
+                expanded_books.append({'name': part.strip(), 'url': url})
         else:
             expanded_books.append(book)
     return expanded_books
+
+
+def search_for_book(search_term):
+    books = get_books_by_search(search_term)
+    if not books:
+        return None
+
+    book_names = [book['name'] for book in books]
+
+    style = Style.from_dict({
+        'input': '#44ff44',
+        'placeholder': '#888888',
+    })
+
+    completer = WordCompleter(book_names, ignore_case=True, match_middle=True)
+
+    # Prompt text with a green background
+    prompt_text = [
+        ('class:prompt', 'Enter title - Searched (Leave blank for return): '),
+        ('class:input', ''),
+    ]
+
+    os.system('cls' if os.name in ('nt', 'dos') else 'clear')
+    input_book = prompt(prompt_text, style=style, completer=completer)
+    if input_book.strip() in book_names:
+        global_books.extend(books)
+        return input_book.strip()
+
+    return None
 
 
 def prompt_user_for_book(books: list):
@@ -113,7 +158,7 @@ def prompt_user_for_book(books: list):
 
     # Prompt text with a green background
     prompt_text = [
-        ('class:prompt', 'Enter title: '),
+        ('class:prompt', 'Enter title (Search if not offered): '),
         ('class:input', ''),
     ]
 
@@ -123,7 +168,9 @@ def prompt_user_for_book(books: list):
         if input_book.strip() in book_names:
             return input_book.strip()
         else:
-            print("Please enter a valid book title.")
+            found_book = search_for_book(input_book.strip())
+            if found_book:
+                return found_book.strip()
 
 
 # </editor-fold>
@@ -190,11 +237,12 @@ def analyze_text(book_name, words):
 
 # </editor-fold>
 
+global_books = load_books_from_json()
+
 
 def main():
     # Load book data
-    books = load_books_from_json()
-    if not books:
+    if not global_books:
         books = get_all_gutenberg_books()  # Fetch book data online from Gutenberg
         if not books:
             os.system('cls' if os.name in ('nt', 'dos') else 'clear')
@@ -206,8 +254,8 @@ def main():
         save_books_to_json(books)
 
     # Prompt user to select a book
-    selected_book_name = prompt_user_for_book(books)
-    selected_book_url = [x['url'] for x in books if x['name'] == selected_book_name][0]
+    selected_book_name = prompt_user_for_book(global_books)
+    selected_book_url = [x['url'] for x in global_books if x['name'] == selected_book_name][0]
 
     steps = [
         'Fetch HTML (text) content of the book',
