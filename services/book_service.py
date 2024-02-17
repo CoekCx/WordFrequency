@@ -28,22 +28,24 @@ class BookService:
             nltk.download('stopwords')
 
     @staticmethod
+    def fetch_book_data():
+        if BookService.service_books:
+            return
+
+        BookService.service_books = BookService.__load_books_from_json()  # Fetch book data online from Gutenberg
+        if not BookService.service_books:
+            BookService.service_books = BookService.__get_all_gutenberg_books()  # Fetch book data online from Gutenberg
+
+        BookService.service_books = BookService.__expand_books_with_or(BookService.service_books)
+        BookService.__save_books_to_json(BookService.service_books)
+
+    @staticmethod
     def get_books() -> list:
         if BookService.service_books:
             return BookService.service_books
 
-        service_books = BookService.__load_books_from_json()  # Fetch book data online from Gutenberg
-        if not service_books:
-            service_books = BookService.__get_all_gutenberg_books()  # Fetch book data online from Gutenberg
-            if not service_books:
-                os.system('cls' if os.name in ('nt', 'dos') else 'clear')
-                print("Failed to get the list of Gutenberg books.")
-                input()
-                return
-
-        service_books = BookService.__expand_books_with_or(service_books)
-        BookService.__save_books_to_json(service_books)
-        return service_books
+        BookService.fetch_book_data()
+        return BookService.service_books
 
     @staticmethod
     def __load_books_from_json():
@@ -121,3 +123,7 @@ class BookService:
             else:
                 expanded_books.append(book)
         return expanded_books
+
+
+BookService.download_neccessary_nltk_data()
+BookService.fetch_book_data()

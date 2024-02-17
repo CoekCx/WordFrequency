@@ -26,5 +26,4 @@ def index():
 
 
 if __name__ == '__main__':
-    BookService.download_neccessary_nltk_data()
     app.run(port=5000, debug=True)
