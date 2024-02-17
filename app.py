@@ -43,7 +43,7 @@ def index():
             book_options = [("", "Select a book")] + [(book_title, book_title) for book_title in
                                                       searched_books_titles]
             search_form = BookSearchForm(book_options)
-            return render_template('search-books.html', form=search_form)
+            return render_template('search-books.html', form=search_form, searched_title=title)
         flash('No book found with that title!', 'error')
 
     book_titles = BookService.get_book_titles()
