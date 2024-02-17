@@ -5,6 +5,7 @@ from flask_cors import CORS
 
 from forms.book_lookup_form import BookLookupForm
 from forms.book_search_form import BookSearchForm
+from services.book_analyzer import BookAnalyzer
 from services.book_service import BookService
 
 app = Flask(__name__)
@@ -22,8 +23,21 @@ def index():
     if form.is_submitted():
         # Process form data here
         title = form.title.data
+        if title == '':
+            books = BookService.get_books()
+            book_titles = list(set([book['name'] for book in books]))
+            return render_template('index.html', form=form, book_titles=book_titles)
+
         if BookService.is_book_available(title):
-            return f'Book title available: {title}'
+            url = BookService.get_book_url(title)
+            if url != 'URL not found':
+                book_data = BookAnalyzer.analyze_book(url)
+                return f'Stats:\n{book_data}'
+
+            flash("Couldn't find the URL for the book in our data!", 'error')
+            books = BookService.get_books()
+            book_titles = list(set([book['name'] for book in books]))
+            return render_template('index.html', form=form, book_titles=book_titles)
 
         searched_books = BookService.get_books_by_search(title)
         if searched_books:

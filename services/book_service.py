@@ -59,6 +59,16 @@ class BookService:
         return any(book['name'] == book_title for book in BookService.service_books)
 
     @staticmethod
+    def get_book_url(book_title: str) -> str:
+        # Iterate through the list of dictionaries
+        for book in BookService.service_books:
+            if book['name'] == book_title:
+                return book['url']
+
+        # Return a default value if no matching book is found
+        return "URL not found"
+
+    @staticmethod
     def __load_books_from_json():
         if os.path.exists("book_data.json"):
             with open("book_data.json", "r") as file:
