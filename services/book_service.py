@@ -67,14 +67,14 @@ class BookService:
         return any(book['name'] == book_title for book in BookService.service_books)
 
     @staticmethod
-    def get_book_url(book_title: str) -> str:
+    def get_book_url_and_author(book_title: str) -> (str, str):
         # Iterate through the list of dictionaries
         for book in BookService.service_books:
             if book['name'] == book_title:
-                return book['url']
+                return book['url'], book['author']
 
         # Return a default value if no matching book is found
-        return "URL not found"
+        return "URL not found", "Author not found"
 
     @staticmethod
     def __load_books_from_json():
@@ -101,9 +101,13 @@ class BookService:
             book_data = []
             for link in book_links:
                 name = link.find('span', class_='title').text.strip()
+                try:
+                    author = link.find('span', class_='subtitle').text.strip()
+                except:
+                    author = 'No Info Found'
                 relative_url = link.find('a')['href']
                 full_url = "https://www.gutenberg.org" + relative_url
-                book_data.append({'name': name, 'url': full_url})
+                book_data.append({'name': name, 'author': author, 'url': full_url})
 
             return book_data
         else:
@@ -138,17 +142,18 @@ class BookService:
         expanded_books = []
         for book in names_and_urls:
             name = book['name']
+            author = book['author']
             url = book['url']
 
             # Check if the name contains the pattern "{name1}; Or, {name2}"
             if '; Or, ' in name:
                 name_parts = name.split('; Or, ')
                 for part in name_parts:
-                    expanded_books.append({'name': part.strip(), 'url': url})
+                    expanded_books.append({'name': part.strip(), 'author': author, 'url': url})
             elif '; or, ' in name:
                 name_parts = name.split('; or, ')
                 for part in name_parts:
-                    expanded_books.append({'name': part.strip(), 'url': url})
+                    expanded_books.append({'name': part.strip(), 'author': author, 'url': url})
             else:
                 expanded_books.append(book)
         return expanded_books

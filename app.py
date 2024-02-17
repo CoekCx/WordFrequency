@@ -28,10 +28,10 @@ def index():
             return render_template('index.html', form=form, book_titles=book_titles)
 
         if BookService.is_book_available(title):
-            url = BookService.get_book_url(title)
+            url, author = BookService.get_book_url_and_author(title)
             if url != 'URL not found':
-                book_data = BookAnalyzer.analyze_book(url)
-                return f'Stats:\n{book_data}'
+                book_data = BookAnalyzer.analyze_book(title, author, url)
+                return render_template('show-book-stats.html', data=book_data)
 
             flash("Couldn't find the URL for the book in our data!", 'error')
             book_titles = BookService.get_book_titles()
@@ -44,7 +44,7 @@ def index():
                                                       searched_books_titles]
             search_form = BookSearchForm(book_options)
             return render_template('search-books.html', form=search_form, searched_title=title)
-        flash('No book found with that title!', 'error')
+        flash('No book found with that title!', 'info')
 
     book_titles = BookService.get_book_titles()
     return render_template('index.html', form=form, book_titles=book_titles)

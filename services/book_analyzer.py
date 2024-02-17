@@ -8,7 +8,7 @@ from nltk.tokenize import word_tokenize
 
 class BookAnalyzer:
     @staticmethod
-    def analyze_book(book_url) -> str or dict:
+    def analyze_book(title, author, book_url) -> str or dict:
         text_content = BookAnalyzer.__fetch_book(book_url)
         if not text_content:
             return "Failed to fetch HTML content of Moby Dick."
@@ -34,7 +34,7 @@ class BookAnalyzer:
             return "Failed to remove stop words."
 
         # Analyze the processed text
-        return BookAnalyzer.__analyze_text(filtered_words)
+        return BookAnalyzer.__analyze_text(filtered_words, title, author)
 
     @staticmethod
     def __fetch_book(book_url: str):
@@ -73,13 +73,15 @@ class BookAnalyzer:
         return filtered_words
 
     @staticmethod
-    def __analyze_text(words):
+    def __analyze_text(words, title, author):
         total_words = len(words)
         unique_words = len(set(words))
         word_count = Counter(words).most_common(10)  # Top 10 most common words
         analasys_data = {
+            'title': title,
+            'author': author,
             'total_words': total_words,
             'unique_words': unique_words,
-            'word_count': word_count,
+            'top_words': [{'word': word, 'frequency': frequency} for word, frequency in word_count],
         }
         return analasys_data

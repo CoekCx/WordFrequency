@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+
+{% block styles %}
+    <style>
+        .card {
+            min-width: 125%;
+            margin-top: 35vh;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div id="card" class="card" style="margin-right: 15px">
+        <div class="card-body form-container">
+            <div class="row">
+                <div class="col">
+                    <h2 id="title_parent">Title: <span class="badge badge-dark" id="title">{{ data.title }}</span></h2>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <h2 id="author_parent">Author: <span class="badge badge-dark" id="author">{{ data.author }}</span>
+                    </h2>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <h1>Total Words: <span class="badge badge-primary">{{ data.total_words }}</span></h1>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <h1>Unique Words: <span class="badge badge-secondary">{{ data.unique_words }}</span></h1>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card" style="margin-right: 15px; margin-left: 15px;">
+        <div class="card-body form-container">
+            <h1 class="mt-4 text-center" style="margin-bottom: 30px">Top 10 Words:</h1>
+            <ul class="list-group">
+                {% for word in data.top_words %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {{ word.word }}
+                        <span class="badge badge-primary badge-pill">{{ word.frequency }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <div class="card" style="margin-left: 15px">
+        <div class="card-body form-container">
+            <canvas id="myChart" width="400" height="400"></canvas>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        var labels = [];
+        var frequencies = [];
+
+        // Populate data for Chart.js
+        {% for word in data.top_words %}
+            labels.push('{{ word.word }}');
+            frequencies.push({{ word.frequency }});
+        {% endfor %}
+
+        // Create chart
+        var ctx = document.getElementById('myChart').getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Word Frequency',
+                    data: frequencies,
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                }
+            }
+        });
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const parentElement = document.getElementById('card');
+            const titleElement = document.getElementById('title');
+            const titleParentElement = document.getElementById('title_parent');
+            const authorElement = document.getElementById('author');
+            const authorParentElement = document.getElementById('author_parent');
+
+            // Check if the text element width exceeds the parent element width
+            if (titleElement.offsetWidth > parentElement.offsetWidth) {
+                const text = titleElement.textContent;
+                const halfwayPoint = Math.floor(text.length / 2);
+
+                // Split the text into two parts
+                const firstPart = text.substring(0, halfwayPoint);
+                const secondPart = text.substring(halfwayPoint);
+
+                // Create two new span elements
+                const firstSpan = document.createElement('span');
+                firstSpan.textContent = firstPart;
+                firstSpan.classList.add('badge', 'badge-dark');
+
+                const secondSpan = document.createElement('span');
+                secondSpan.textContent = secondPart;
+                secondSpan.classList.add('badge', 'badge-dark');
+
+                // Replace the original text element with the new span elements
+                titleParentElement.innerHTML = 'Title: ';
+                titleParentElement.appendChild(firstSpan);
+                titleParentElement.appendChild(secondSpan);
+            }
+
+            // Check if the text element width exceeds the parent element width
+            if (authorElement.offsetWidth > parentElement.offsetWidth) {
+                const text = authorElement.textContent;
+                const halfwayPoint = Math.floor(text.length / 2);
+
+                // Split the text into two parts
+                const firstPart = text.substring(0, halfwayPoint);
+                const secondPart = text.substring(halfwayPoint);
+
+                // Create two new span elements
+                const firstSpan = document.createElement('span');
+                firstSpan.textContent = firstPart;
+                firstSpan.classList.add('badge', 'badge-dark');
+
+                const secondSpan = document.createElement('span');
+                secondSpan.textContent = secondPart;
+                secondSpan.classList.add('badge', 'badge-dark');
+
+                // Replace the original text element with the new span elements
+                authorParentElement.innerHTML = 'Author: ';
+                authorParentElement.appendChild(firstSpan);
+                authorParentElement.appendChild(secondSpan);
+            }
+        });
+    </script>
+{% endblock %}
