@@ -21,8 +21,11 @@ from prompt_toolkit.styles import Style
 
 # This should be run once before the first run of the script
 def download_neccessary_nltk_data():
-    nltk.download('punkt')
-    nltk.download('stopwords')
+    # Check if NLTK data is already downloaded
+    if not nltk.data.find('tokenizers/punkt'):
+        nltk.download('punkt')
+    if not nltk.data.find('corpora/stopwords'):
+        nltk.download('stopwords')
 
 
 # </editor-fold>
