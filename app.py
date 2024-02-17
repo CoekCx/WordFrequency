@@ -1,4 +1,4 @@
-from flask import Flask, render_template, flash
+from flask import Flask, render_template, flash, jsonify
 from flask_bootstrap import Bootstrap
 from flask_toastr import Toastr
 from flask_cors import CORS
@@ -24,8 +24,7 @@ def index():
         # Process form data here
         title = form.title.data
         if title == '':
-            books = BookService.get_books()
-            book_titles = list(set([book['name'] for book in books]))
+            book_titles = BookService.get_book_titles()
             return render_template('index.html', form=form, book_titles=book_titles)
 
         if BookService.is_book_available(title):
@@ -35,8 +34,7 @@ def index():
                 return f'Stats:\n{book_data}'
 
             flash("Couldn't find the URL for the book in our data!", 'error')
-            books = BookService.get_books()
-            book_titles = list(set([book['name'] for book in books]))
+            book_titles = BookService.get_book_titles()
             return render_template('index.html', form=form, book_titles=book_titles)
 
         searched_books = BookService.get_books_by_search(title)
@@ -48,8 +46,7 @@ def index():
             return render_template('search-books.html', form=search_form)
         flash('No book found with that title!', 'error')
 
-    books = BookService.get_books()
-    book_titles = list(set([book['name'] for book in books]))
+    book_titles = BookService.get_book_titles()
     return render_template('index.html', form=form, book_titles=book_titles)
 
 

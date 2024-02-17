@@ -70,13 +70,13 @@
     <div class="card">
         <div class="card-body form-container">
             <h1 class="card-title text-center form-title">Search Results</h1>
-            <form autocomplete="off" method="POST" action="{{ url_for('index') }}">
+            <form id="form" autocomplete="off" method="POST" action="{{ url_for('index') }}">
                 {{ form.hidden_tag() }}
                 <div class="form-group autocomplete">
                     {{ form.title.label(class="form-control-label") }}
                     {{ form.title(class="form-control", placeholder="Enter book title", id="title") }}
                 </div>
-                <button type="submit" class="btn btn-primary btn-block btn-submit">Analize</button>
+                <button type="submit" class="btn btn-primary btn-block btn-submit" id="analyze-btn">Analyze</button>
                 <a href="{{ url_for('index') }}" class="btn btn-secondary btn-block">Back</a>
             </form>
         </div>

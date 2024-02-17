@@ -48,6 +48,14 @@ class BookService:
         return BookService.service_books
 
     @staticmethod
+    def get_book_titles() -> list:
+        if BookService.service_books:
+            return list(set([book['name'] for book in BookService.service_books]))
+
+        BookService.fetch_book_data()
+        return list(set([book['name'] for book in BookService.service_books]))
+
+    @staticmethod
     def get_stats(book_title: str):
         # TODO: Implement
         #  Implement getting stats for a book
