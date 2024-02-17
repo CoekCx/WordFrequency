@@ -20,7 +20,7 @@ class BookService:
     service_books = None
 
     @staticmethod
-    def download_neccessary_nltk_data():
+    def download_neccessary_nltk_data() -> None:
         # Check if NLTK data is already downloaded and download if not
         if not nltk.data.find('tokenizers/punkt'):
             nltk.download('punkt')
@@ -28,7 +28,7 @@ class BookService:
             nltk.download('stopwords')
 
     @staticmethod
-    def fetch_book_data():
+    def fetch_book_data() -> None:
         if BookService.service_books:
             return
 
@@ -46,6 +46,17 @@ class BookService:
 
         BookService.fetch_book_data()
         return BookService.service_books
+
+    @staticmethod
+    def get_stats(book_title: str):
+        # TODO: Implement
+        #  Implement getting stats for a book
+        pass
+
+    @staticmethod
+    def is_book_available(book_title: str) -> bool:
+        # Check if any dictionary in service_books has the given book_title
+        return any(book['name'] == book_title for book in BookService.service_books)
 
     @staticmethod
     def __load_books_from_json():
@@ -123,6 +134,28 @@ class BookService:
             else:
                 expanded_books.append(book)
         return expanded_books
+
+    @staticmethod
+    def get_books_by_search(search_term: str):
+        encoded_search_term = parse.quote(search_term)
+        # Construct the URL with the encoded search term
+        url = f"https://www.gutenberg.org/ebooks/search/?query={encoded_search_term}&submit_search=Go%21"
+        books_on_page = BookService.__get_books_from_page(url)
+        if books_on_page:
+            books_on_page = BookService.__expand_books_with_or(books_on_page)
+
+            # Add new books to our data
+            made_changes = False
+            for book in books_on_page:
+                if not BookService.is_book_available(book['name']):
+                    BookService.service_books.append(book)
+                    made_changes = True
+            if made_changes:
+                BookService.__save_books_to_json(BookService.service_books)
+
+            return books_on_page
+
+        return None
 
 
 BookService.download_neccessary_nltk_data()
